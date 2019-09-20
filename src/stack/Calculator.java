@@ -8,7 +8,7 @@ package stack;
  */
 public class Calculator {
     public static void main(String[] args) {
-        String expression = "3+2*6-2";
+        String expression = "70+2*6-4";
         ArrayStack2 numStack = new ArrayStack2(10);
         ArrayStack2 operStack = new ArrayStack2(10);
 
@@ -18,6 +18,7 @@ public class Calculator {
         int oper = 0;
         int res = 0;
         char ch = ' ';
+        String keepNum = ""; //用于拼接多位数字
 
         while (true) {
             //得到每一个字符
@@ -45,29 +46,43 @@ public class Calculator {
                     //如果为空直接入符号栈
                     operStack.push(ch);
                 }
-            } else {
-                //ch是一个数,直接入数字栈
+            } else {//ch是一个数,直接入数字栈
                 //numStack.push(ch); 有误，push进去的是字符
-                numStack.push(ch - 48);
+                //numStack.push(ch - 48); //没有考虑多位数数字
+                keepNum += ch;
+
+                //判断是index否为最后一位，如果是，直接入栈
+                if(index == expression.length()-1){
+                    numStack.push(Integer.parseInt(keepNum));
+                }else{
+                    //判断下一位是否是数字
+                    if(operStack.isOper(expression.substring(index+1,index+2).charAt(0))){
+                        numStack.push(Integer.parseInt(keepNum));
+                        keepNum = "";
+                    }
+                }
             }
 
-            index ++;
+            index++;
             //判断index
-            if(index == expression.length()){
+            if (index == expression.length()) {
                 break;
             }
-
-            //表达式扫描完毕，顺序从数栈和符号栈中pop出相应的数字和符号，并运行
-            while(true){
-                if(operStack.isEmpty()){
-                    break;
-                }
-                num1 = numStack.pop();
-                num2 = numStack.pop();
-                oper = operStack.pop();
-
-            }
         }
+            //表达式扫描完毕，顺序从数栈和符号栈中pop出相应的数字和符号，并运算
+        while (true) {
+            if (operStack.isEmpty()) {
+                break;
+            }
+            num1 = numStack.pop();
+            num2 = numStack.pop();
+            oper = operStack.pop();
+
+            res = numStack.cal(num1, num2, oper);
+            numStack.push(res);
+        }
+        System.out.println("结果是" + numStack.pop());
+
     }
 }
 
@@ -149,14 +164,14 @@ class ArrayStack2 {
             case '+':
                 res = num1 + num2;
                 break;
-            case '-':
-                res = num1 - num2;
+            case '-': //注意顺序
+                res = num2 - num1;
                 break;
             case '*':
                 res = num1 * num2;
                 break;
             case '/':
-                res = num1 / num2;
+                res = num2 / num1;
                 break;
         }
         return res;
