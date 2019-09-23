@@ -49,7 +49,7 @@ public class BubbleSort {
                 flag = false;
             }
         }
-        System.out.println(Arrays.toString(array));
+//        System.out.println(Arrays.toString(array));
     }
 
 }
